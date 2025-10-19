@@ -1,0 +1,33 @@
+import Header from '../../components/compounds/Header'
+import NavBar from '../../components/compounds/NavBar'
+import TripList from '../../components/layouts/TripList'
+import { mockTrips } from '../../mocks/trips'
+import { useLocation } from 'wouter';
+
+export default function Home() {
+    const trips = mockTrips
+    const [, navigate] = useLocation();
+
+    return (
+        <div class="min-h-screen bg-gray-50">
+            <NavBar
+                title="My Trips"
+                rightAction={
+                    <button
+                        class="w-8 h-8 flex items-center justify-center rounded-full text-gray-600 hover:bg-gray-100 active:bg-gray-200 transition"
+                        aria-label="Add new trip"
+                        onClick={() => navigate('/trips/new')}
+                    >
+                        +
+                    </button>
+                }
+            />
+
+            <main class="p-4">
+                <Header title='My Trips' subtitle='Plan your fun journey'></Header>
+                <TripList title="UPCOMING TRIPS" trips={trips} />
+                <TripList title="PAST TRIPS" trips={trips} />
+            </main>
+        </div>
+    )
+}
