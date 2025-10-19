@@ -1,6 +1,5 @@
 import { render } from "preact"
 import { StrictMode } from "preact/compat"
-// import { AppProvider } from "./app/provider";
 import "./styles/app.css";
 import { App } from "./app";
 // Enable helpful runtime warnings only in development
@@ -14,9 +13,7 @@ if (!root)
 
 render(
     <StrictMode>
-        {/* <AppProvider> */}
         <App />
-        {/* </AppProvider> */}
     </StrictMode>,
     root
 );
