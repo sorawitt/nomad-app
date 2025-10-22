@@ -50,7 +50,7 @@ export function AppRouter() {
         <Route path="/auth" component={GuestAuth} />
         <Route path="/" component={ProtectedHome} />
         <Route default component={NotFound} />
-        <Route path="/auth/callback" element={<AuthCallback />} />
+        <Route path="/auth/callback" component={AuthCallback} />
       </Router>
     </AuthProvider>
   );
