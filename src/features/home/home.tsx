@@ -3,12 +3,15 @@ import NavBar from '../../components/compounds/NavBar'
 import TripList from '../../components/layouts/TripList'
 import { useAuth } from '../../hooks/useAuth';
 import { mockTrips } from '../../mocks/trips'
-import { useLocation } from 'wouter';
+import { route } from 'preact-router';
 
 export default function Home() {
     const trips = mockTrips
-    const [, navigate] = useLocation();
     const { user, signOut } = useAuth();
+    const handleCreateTrip = () => {
+        route('/trips/new');
+    };
+
     return (
         <div class="min-h-screen bg-gray-50">
             <NavBar
@@ -26,7 +29,7 @@ export default function Home() {
                     <button
                         class="w-8 h-8 flex items-center justify-center rounded-full text-gray-600 hover:bg-gray-100 active:bg-gray-200 transition"
                         aria-label="Add new trip"
-                        onClick={() => navigate('/trips/new')}
+                        onClick={handleCreateTrip}
                     >
                         +
                     </button>

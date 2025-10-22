@@ -15,7 +15,7 @@ Side project ที่ทดลองต่อยอด Preact + Supabase สำ
 ## Tech Stack
 - **Frontend:** Preact 10, TypeScript, Vite, Tailwind CSS v4
 - **State/Data:** @tanstack/react-query, Supabase JS v2
-- **Routing:** preact-router (main), wouter (hook ช่วย navigate)
+- **Routing:** preact-router
 - **Tooling:** Bun (package manager + lockfile), Vitest (พร้อมใช้ถ้าอยากเขียนเทสต์)
 
 ---
