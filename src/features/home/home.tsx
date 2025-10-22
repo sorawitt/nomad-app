@@ -1,17 +1,27 @@
 import Header from '../../components/compounds/Header'
 import NavBar from '../../components/compounds/NavBar'
 import TripList from '../../components/layouts/TripList'
+import { useAuth } from '../../hooks/useAuth';
 import { mockTrips } from '../../mocks/trips'
 import { useLocation } from 'wouter';
 
 export default function Home() {
     const trips = mockTrips
     const [, navigate] = useLocation();
-
+    const { user, signOut } = useAuth();
     return (
         <div class="min-h-screen bg-gray-50">
             <NavBar
-                title="My Trips"
+                title= {'My Trips' + ' - ' + user?.user_metadata.name}
+                leftAction={
+                    <button
+                        class="w-8 h-8 flex items-center justify-center rounded-full text-gray-600 hover:bg-gray-100 active:bg-gray-200 transition"
+                        aria-label="Open menu"
+                         onClick={signOut}
+                    >
+                        ☰
+                    </button>
+                }
                 rightAction={
                     <button
                         class="w-8 h-8 flex items-center justify-center rounded-full text-gray-600 hover:bg-gray-100 active:bg-gray-200 transition"
