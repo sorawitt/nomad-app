@@ -1,47 +1,140 @@
 # Trip Planner Mini-App PRD
 
-## 1. 🧭 Overview
-- **วิสัยทัศน์:** Trip Planner แบบ mobile-first ที่ช่วยทีมท่องเที่ยววางแผน ร่วมมือ และติดตามสถานะได้ครบวงจร รวมถึงแนบหลักฐานการใช้จ่ายเพื่อสรุปทริปได้ง่าย
-- **เป้าหมาย:** ภายใน 6 เดือน Home→Create Trip conversion ≥ 60%, retention วันถัดไป ≥ 40%, อัตราใช้ Today Mode ในทริปที่ active ≥ 70%, ค่าเฉลี่ยกิจกรรมที่ถูกทำเครื่องหมาย complete ≥ 3 รายการ/ทริป
-- **Non-goals:** ระบบจองตั๋วหรือที่พัก, AI itinerary generator, ระบบ chat/voice, การจัดการไฟล์แนบขนาด >10MB, การแปลงอัตราแลกเปลี่ยนอัตโนมัติ
-- **ตัวชี้วัดความสำเร็จ:** DAU/WAU Trip Planner, funnel Home→create_trip→add_activity, budget coverage %, error rate API < 1%, NPS หลังใช้งานครั้งที่ 3
+## Overview
 
-## 2. 👤 Personas & JTBD
-- **Trip Lead (25-34 ปี, ทำงานในเมืองใหญ่, ใช้มือถือเป็นหลัก):** เจ็บปวดจากการใช้สเปรดชีตหลายไฟล์ งบไม่รวมศูนย์ แชร์ itinerary ยาก  
-  - **JTBD:** “เมื่อเตรียมทริปกลุ่ม ฉันต้องการรวมกิจกรรม งบ และไฟล์ที่เกี่ยวข้องไว้ที่เดียว เพื่อให้ทีมช่วยอัปเดตได้ทันที”
-- **Co-traveler (23-32 ปี, เป็นผู้ร่วมเดินทาง):** ต้องการเห็นกิจกรรมวันนี้ ควบคุมค่าใช้จ่าย โปร่งใส  
-  - **JTBD:** “เมื่ออยู่ระหว่างทริป ฉันต้องการดูสิ่งที่ต้องทำวันนี้ แนบหรือดูใบเสร็จ และติ๊กกิจกรรมเสร็จได้รวดเร็ว”
-- **Financial Keeper (บทบาทเสริม):** ผู้รับผิดชอบจัดการค่าใช้จ่าย ต้องการสรุปและดาวน์โหลดไฟล์หลักฐานหลังจบทริป
+**Vision:** Mobile-first trip planner ช่วยทีมท่องเที่ยววางแผน ร่วมมือ ติดตามสถานะ และแนบหลักฐานค่าใช้จ่าย
 
-## 3. 🎯 Scope & Release Plan
-- **Must-have:** Supabase Auth, CRUD trip/day/activity, Today Mode, Budget tracker, แนบไฟล์กิจกรรม (อัปโหลด/ดู/ลบ ≤5MB), แชร์ลิงก์อ่านอย่างเดียว, skeleton/empty/error states, analytics events พื้นฐาน
-- **Nice-to-have:** Collaborator editor role, เชิญเพื่อนผ่านอีเมล, Activity quick template, Google Maps deeplink พร้อมทิศทาง, Settings สำหรับ currency & analytics consent, Dark mode
-- **Out-of-scope:** หลายสกุลเงินพร้อมแปลง FX, Export PDF itinerary, ปฏิทินออฟไลน์เต็มรูปแบบ, ระบบแจ้งเตือน push, การแนบไฟล์ขนาดใหญ่หรือหลายประเภทนอก image/PDF
-- **Release R1 (สัปดาห์ 0-4):** Auth, Home, New Trip, Trip Detail (Day list), Today Mode พื้นฐาน, Budget summary, Attachment upload + preview จำกัด 1 ไฟล์/กิจกรรม, analytics `create_trip`, `add_activity`, `open_today`, `complete_activity`
-- **Release R2 (สัปดาห์ 5-8):** Settings, Collaborator editor, Many attachments/กิจกรรม พร้อมสิทธิ์, Google Maps deeplink, แชร์ token read-only, Offline queue + conflict toast, Budget รายงานตามหมวด, analytics `upload_attachment`, `view_attachment`
+**Goals (6 เดือน):**
+- Home → Create Trip conversion ≥ 60%
+- Retention วันถัดไป ≥ 40%
+- Today Mode usage ≥ 70% ในทริปที่ active
+- กิจกรรมที่ complete เฉลี่ย ≥ 3 รายการ/ทริป
 
-## 4. 📱 UX & IA
-- **IA หลัก:** `Home → Trip Detail → (Today | Days | Budget | Settings)` ด้วย bottom tab/segmented control; Attachment modal เข้าผ่าน Activity card และ Budget detail
-- **Home:** รายการทริปล่าสุด, แสดงจำนวนกิจกรรมวันนี้, CTA “สร้างทริปใหม่”, empty state พร้อม illustration, skeleton cards 3 ใบ
-- **New Trip:** ฟอร์ม name/date/currency, summary จำนวนวัน auto, error inline ต่อ field, future slot สำหรับ invite email (R2)
-- **Trip Detail (Day list):** Timeline card ต่อวัน, badge จำนวนกิจกรรม + ค่าใช้จ่าย, ปุ่ม `+กิจกรรม`, thumbnail สำหรับกิจกรรมที่มีไฟล์แนบ, empty state “เพิ่มวันแรกของคุณ”
-- **Today Mode:** Sticky header ข้อมูลทริป, list กิจกรรมวันนี้พร้อม checkbox และ quick action “แนบไฟล์/ดูไฟล์”, skeleton เป็น list bar, offline banner เมื่อ sync ค้าง
-- **Budget:** Tab “ทั้งหมด” “ตามหมวด”, donut summary, รายการค่าใช้จ่ายพร้อมยอดสะสม, ปุ่ม `+ค่าใช้จ่าย`, preview ใบเสร็จ, empty state ชวนเพิ่มค่าใช้จ่ายแรก
-- **Settings:** โปรไฟล์, default currency, toggle analytics consent, toggle offline cache, ปุ่ม logout
-- **User Flows:**  
-  - `Home → New Trip → Save → Auto-create days → Trip Detail → Add Activity → Attach file → Trip Detail`  
-  - `Home → Trip Detail → Today Mode → Complete Activity → Add Expense → Upload receipt → Budget`  
-  - `Home → Trip Detail → Share → Generate token → Share sheet → Recipient opens read-only view`
-- **States:** Empty (ข้อความ+CTA), Loading (skeleton list/timeline), Error (toast + retry, offline banner “รอซิงก์” พร้อมปุ่ม refresh)
+**Key Metrics:**
+- DAU/WAU ratio
+- Funnel: Home → create_trip → add_activity
+- Budget coverage %
+- API error rate < 1%
+- NPS หลังใช้งานครั้งที่ 3
 
-## 5. 🗃 Data Model (Supabase/Postgres)
-- **ERD เชิงข้อความ:**  
-  - `profiles` (ผู้ใช้) 1:N `trips` (ทริป)  
-  - `trips` 1:N `trip_days`, `activities`, `expenses`, `activity_attachments`  
-  - `trip_members` เชื่อม user กับ trip สำหรับ owner/editor  
-  - `user_settings` 1:1 กับ `profiles` เพื่อเก็บ preference  
-- **ตารางหลักและคอลัมน์สำคัญ:**  
-  - ทุกตารางมี `id`, `created_at`, `updated_at`, และ FK เช่น `user_id/owner_id`, `trip_id`, `day_index`
+**Out of Scope:**
+- จองตั๋ว/ที่พัก
+- AI itinerary generator
+- Chat/voice
+- ไฟล์แนบ >10MB
+- แปลงอัตราแลกเปลี่ยนอัตโนมัติ
+
+## Personas & Jobs-to-be-Done
+
+### Trip Lead (25-34 ปี, mobile-first)
+**Pain Points:** สเปรดชีตกระจัด งบไม่รวมศูนย์ แชร์ยาก
+
+**JTBD:** "รวมกิจกรรม งบ และไฟล์ไว้ที่เดียว ให้ทีมช่วยอัปเดตได้ทันที"
+
+### Co-traveler (23-32 ปี)
+**Pain Points:** ไม่รู้กิจกรรมวันนี้ ไม่แน่ใจค่าใช้จ่าย
+
+**JTBD:** "ดูกิจกรรมวันนี้ แนบใบเสร็จ และติ๊กกิจกรรมเสร็จได้รวดเร็ว"
+
+### Financial Keeper
+**Pain Points:** สรุปค่าใช้จ่ายยาก ไฟล์หลักฐานกระจัด
+
+**JTBD:** "สรุปและดาวน์โหลดหลักฐานหลังจบทริป"
+
+## Scope & Release Plan
+
+### Must-Have (R1)
+- Supabase Auth (Magic Link + Google OAuth)
+- CRUD: trip, day, activity
+- Today Mode
+- Budget tracker
+- Attachment: อัปโหลด/ดู/ลบ ≤5MB (1 ไฟล์/กิจกรรม)
+- Share link (read-only)
+- UI states: skeleton, empty, error
+- Analytics: `create_trip`, `add_activity`, `open_today`, `complete_activity`
+
+### Nice-to-Have (R2)
+- Collaborator editor
+- เชิญผ่านอีเมล
+- Activity template
+- Google Maps deeplink
+- Settings: currency, analytics consent
+- Dark mode
+- Multi-attachments พร้อมสิทธิ์
+- Offline queue + conflict alert
+- Budget ตามหมวด
+
+### Release Timeline
+**R1 (สัปดาห์ 0-4):** Auth → Home → Create Trip → Trip Detail → Today Mode → Budget → Attachment (single)
+
+**R2 (สัปดาห์ 5-8):** Settings → Collaborators → Multi-attachments → Maps → Offline sync → Conflict resolution
+
+## UX & Information Architecture
+
+### Navigation
+`Home → Trip Detail → (Today | Days | Budget | Settings)`
+
+Bottom tab/segmented control สำหรับ mobile
+
+### Screen Specs
+
+**Home**
+- รายการทริปล่าสุด + จำนวนกิจกรรมวันนี้
+- CTA "สร้างทริปใหม่"
+- States: skeleton (3 cards), empty state
+
+**New Trip**
+- Fields: name, date range, currency
+- Auto summary จำนวนวัน
+- Inline validation
+
+**Trip Detail (Day List)**
+- Timeline cards ต่อวัน
+- Badge: จำนวนกิจกรรม + ค่าใช้จ่าย
+- ปุ่ม `+กิจกรรม`
+- Thumbnail ไฟล์แนบ
+
+**Today Mode**
+- Sticky header ข้อมูลทริป
+- List กิจกรรมวันนี้ + checkbox
+- Quick action: แนบไฟล์/ดูไฟล์
+- Offline banner เมื่อ sync ค้าง
+
+**Budget**
+- Tab: ทั้งหมด | ตามหมวด
+- Summary + donut chart
+- รายการค่าใช้จ่าย + ยอดสะสม
+- Preview ใบเสร็จ
+
+**Settings**
+- โปรไฟล์
+- Default currency
+- Toggle: analytics consent, offline cache
+- Logout
+
+### Key User Flows
+
+1. **Create Trip:** Home → New Trip → Save → Auto-create days → Trip Detail
+2. **Track Activity:** Trip Detail → Add Activity → Attach file → Complete
+3. **Share Trip:** Trip Detail → Share → Generate token → Recipient views (read-only)
+
+### UI States
+- **Empty:** ข้อความ + CTA
+- **Loading:** Skeleton list/timeline
+- **Error:** Toast + retry button
+- **Offline:** Banner "รอซิงก์" + refresh button
+
+## Data Model
+
+### Entity Relationships
+- `profiles` 1:N `trips`
+- `trips` 1:N `trip_days`, `activities`, `expenses`, `activity_attachments`
+- `trip_members` (join table) → owner/editor สำหรับ collaboration
+- `user_settings` 1:1 `profiles`
+
+### Schema Notes
+- ทุกตารางมี: `id` (uuid), `created_at`, `updated_at`
+- Foreign keys: `user_id`, `owner_id`, `trip_id`, `day_id`
 ```sql
 CREATE TABLE profiles (
   id uuid PRIMARY KEY REFERENCES auth.users(id),
@@ -148,105 +241,181 @@ CREATE TABLE user_settings (
 );
 CREATE INDEX user_settings_user_idx ON user_settings(user_id);
 ```
-- **RLS ตัวอย่าง:**  
+### RLS Examples
+
+**trips**
 ```sql
-CREATE POLICY "trip_owner_insert"
-ON trips FOR INSERT
+-- Owner สามารถ insert
+CREATE POLICY "trip_owner_insert" ON trips FOR INSERT
 WITH CHECK (auth.uid() = owner_id);
 
-CREATE POLICY "trip_member_select"
-ON trips FOR SELECT
+-- Owner + members อ่านได้
+CREATE POLICY "trip_member_select" ON trips FOR SELECT
 USING (auth.uid() = owner_id OR auth.uid() IN (
   SELECT user_id FROM trip_members WHERE trip_id = trips.id
 ));
+```
 
-CREATE POLICY "activities_member_rw"
-ON activities FOR ALL
+**activities**
+```sql
+-- Owner + editors ทำ CRUD ได้
+CREATE POLICY "activities_member_rw" ON activities FOR ALL
 USING (
   auth.uid() = (SELECT owner_id FROM trips WHERE id = activities.trip_id)
   OR auth.uid() IN (
     SELECT user_id FROM trip_members WHERE trip_id = activities.trip_id
   )
 );
-
-CREATE POLICY "attachments_member_rw"
-ON activity_attachments FOR ALL
-USING (
-  auth.uid() = owner_id
-  OR auth.uid() = (SELECT owner_id FROM trips WHERE id = activity_attachments.trip_id)
-  OR auth.uid() IN (
-    SELECT user_id FROM trip_members WHERE trip_id = activity_attachments.trip_id
-  )
-)
-WITH CHECK (
-  auth.uid() = owner_id
-);
 ```
 
-## 6. 🔐 Auth & Security
-- **วิธี login:** Supabase Email Magic Link + OAuth Google, ใช้ Supabase Auth helper ใน `provider.tsx` ตรวจ session และรีเฟรช token background
-- **Session:** เก็บไว้ใน Supabase client; ปกป้อง route ผ่าน router guard ตรวจ `auth.session()`; ใช้ `@supabase/supabase-js` กับ context hook
-- **RLS ต่อโต๊ะ:**  
-  - `profiles`, `user_settings`: `auth.uid() = id/user_id`  
-  - `trips`: owner insert/update/delete, members read, editor update ใน R2  
-  - `trip_days`, `activities`, `expenses`, `activity_attachments`: owner/editor CRUD; read-only สำหรับผู้ถือ shared token ผ่าน edge function  
-  - `trip_members`: owner-only manage roles  
-- **Supabase Storage:** bucket `trip-attachments` private; signed URL อายุ ≤ 60 วินาที; การลบ/อัปโหลดผ่าน Edge Function ตรวจสิทธิ์; ปิด public read
+## Auth & Security
 
-## 7. 🔁 Sync/Offline
-- **Caching:** ใช้ IndexedDB ผ่าน localForage สำหรับ trips/days/activities/expenses/attachments metadata; fallback localStorage สำหรับสถานะ session
-- **Prefetch:** ดึงรายการทริป+วันเมื่อ login; cache Today Mode เมื่อเข้า Trip Detail
-- **Sync schedule:** background sync ทุก 5 นาทีหรือเมื่อกลับมาออนไลน์; ใช้ `updated_at` เพื่อเช็ค delta
-- **Conflict policy:** Last-write-wins บน `updated_at`; หากมี diff ระหว่าง offline และ server ให้แจ้ง toast “มีการอัปเดตใหม่ ให้ตรวจสอบ” และแสดงไอคอน diff ในกิจกรรม/ไฟล์แนบ (R2 UI)
-- **Attachment offline:** เก็บ blob ชั่วคราวใน IndexedDB พร้อม metadata; เมื่อออนไลน์อัปโหลดผ่าน signed URL แล้วอัปเดตสถานะ; ลบไฟล์ชั่วคราวหลังสำเร็จ
+### Authentication
+- **Methods:** Email Magic Link + Google OAuth
+- **Session:** Supabase client + router guard
+- **Implementation:** `AuthProvider` ใน `provider.tsx`
 
-## 8. 🔌 Integrations
-- **Google Maps:** ปุ่ม “เปิดแผนที่” บน Activity card สร้าง deeplink `https://www.google.com/maps/search/?api=1&query={lat},{lng}`; R2 เพิ่มปุ่ม “นำทาง” เปิด Google Maps App
-- **แชร์ลิงก์ทริป:** สร้าง `shared_token` ใน trips; endpoint `/trip/:token` ให้สิทธิ์ read-only; ใช้ Web Share API บนมือถือ; token สามารถ revoke ผ่าน Settings
+### Row Level Security (RLS)
 
-## 9. 🧪 Analytics & Telemetry
-- **เครื่องมือ:** Supabase Edge Function logging หรือ PostHog self-host; config ผ่าน env
-- **Events หลัก:**  
-  - `create_trip` (payload: `trip_id`, `day_count`)  
-  - `add_activity` (`trip_id`, `day_id`, `has_attachment`)  
-  - `open_today` (`trip_id`, `activity_count`)  
-  - `complete_activity` (`activity_id`, `duration_seconds`)  
-  - `upload_attachment` (`activity_id`, `file_type`, `file_size`)  
-  - `view_attachment` (`attachment_id`, `source`)  
-- **Telemetry เสริม:** error rate Supabase, network offline duration, sync retry count
+| Table | Policy |
+|-------|--------|
+| `profiles`, `user_settings` | `auth.uid() = user_id` |
+| `trips` | Owner: CRUD / Members: Read / Editor: Update (R2) |
+| `activities`, `expenses` | Owner + Editor: CRUD / Shared token: Read (via edge function) |
+| `trip_members` | Owner-only manage |
 
-## 10. 🛠 Dev Notes
-- **Stack:** Preact + TypeScript + Bun runtime (script runner) + Vite + Tailwind CSS v4 + Supabase client
-- **Folder layout:**  
-  - `src/app` (router, provider, layout)  
-  - `src/features` (โดเมน Home, Trips, Today, Budget, Settings)  
-  - `src/components` (primitives/compounds/layouts)  
-  - `src/hooks`, `src/lib` (supabase client, analytics), `src/types`, `src/styles`, `src/mocks`
-- **API client:** Wrapper `src/lib/supabase.ts`; hooks `useTrips`, `useTripDays`, `useActivities`, `useExpenses`, `useAttachments` ใช้ SWR/React Query พร้อม optimistic update
-- **Environment:** `.env.local` ต้องกำหนด `VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY`, `VITE_APP_VERSION`, `VITE_POSTHOG_KEY (optional)`
-- **Testing:** Vitest + Testing Library Preact; mock Supabase ผ่าน MSW; snapshot UI สำหรับ skeleton/error state
-- **Build/Deploy:** Bun scripts `bun run lint/test/build`; deploy frontend ผ่าน Static hosting (Netlify/Vercel) + Supabase functions สำหรับ signed URL
+### Storage Security
+- Bucket: `trip-attachments` (private)
+- Signed URL: อายุ ≤ 60 วินาที
+- Upload/delete: ผ่าน Edge Function ตรวจสิทธิ์
 
-## 11. ⚠️ Risks & Mitigations
-- **Offline conflict ทำให้ข้อมูลหาย:** แสดง warning + เก็บ `updated_at`/revision; R2 เพิ่ม diff view ก่อน merge
-- **Performance บนมือถือเมื่อมีทริปใหญ่:** ใช้ list virtualization, lazy load วัน, จำกัดภาพ thumbnail ≤ 200KB
-- **Shared token รั่วไหล:** Owner regenerate token และ revoke; logging การเข้าถึง token
-- **Storage โตเร็ว:** จำกัดจำนวนไฟล์/กิจกรรม, แจ้ง quota ใน Settings, เพิ่ม cron ลบไฟล์ orphan
-- **Analytics privacy:** เคารพ toggle consent, ไม่เก็บข้อมูลส่วนบุคคลใน payload
+## Offline & Sync Strategy
 
-## 12. 📅 Milestones & Acceptance Criteria
-- **Milestone 1 (สัปดาห์ 2):** Auth + Home + New Trip + analytics `create_trip`  
-  - **AC:** ผู้ใช้ใหม่ login สร้างทริปแรกได้บนมือถือภายใน 2 นาที
-- **Milestone 2 (สัปดาห์ 4):** Trip Detail + Today Mode + Budget summary + single attachment  
-  - **AC:** เพิ่มกิจกรรม/ค่าใช้จ่ายได้, แนบใบเสร็จและดูภาพได้, Today Mode แสดงเฉพาะกิจกรรมวันนี้
-- **Milestone 3 (สัปดาห์ 6):** Settings + Offline cache + แชร์ลิงก์อ่านอย่างเดียว  
-  - **AC:** เปิดโหมด offline แล้วอ่านข้อมูลล่าสุดได้, token แชร์ใช้ได้และ revoke ได้
-- **Milestone 4 (สัปดาห์ 8):** Collaborator editor + Maps deeplink + conflict alert + multi-attachment  
-  - **AC:** Editor เพิ่มกิจกรรม/แนบไฟล์ได้, deeplink เปิดแผนที่, มีการแจ้งเตือนเมื่อเกิด conflict จากการ sync
+### Caching
+- **Storage:** IndexedDB (via localForage)
+- **Data:** trips, days, activities, expenses, attachments metadata
+- **Session:** localStorage fallback
+
+### Sync Behavior
+- **Prefetch:** ทริป + วันที่ login; Today Mode เมื่อเข้า Trip Detail
+- **Schedule:** ทุก 5 นาที หรือเมื่อกลับออนไลน์
+- **Delta:** ใช้ `updated_at` เช็คความเปลี่ยนแปลง
+
+### Conflict Resolution
+- **Policy:** Last-write-wins (ตาม `updated_at`)
+- **UI:** Toast "มีการอัปเดตใหม่" + ไอคอน diff (R2)
+
+### Attachment Offline
+1. เก็บ blob ชั่วคราวใน IndexedDB + metadata
+2. เมื่อออนไลน์ → อัปโหลดผ่าน signed URL
+3. อัปเดตสถานะ → ลบไฟล์ชั่วคราว
+
+## Integrations
+
+### Google Maps
+- ปุ่ม "เปิดแผนที่" บน Activity card
+- Deeplink: `https://www.google.com/maps/search/?api=1&query={lat},{lng}`
+- R2: ปุ่ม "นำทาง" เปิด Google Maps App
+
+### Trip Sharing
+- สร้าง `shared_token` ใน trips table
+- Endpoint: `/trip/:token` (read-only)
+- Web Share API สำหรับ mobile
+- Revoke token ผ่าน Settings
+
+## Analytics & Telemetry
+
+### Tools
+- Supabase Edge Function logging / PostHog self-host
+- Config: environment variables
+
+### Core Events
+
+| Event | Payload |
+|-------|---------|
+| `create_trip` | `trip_id`, `day_count` |
+| `add_activity` | `trip_id`, `day_id`, `has_attachment` |
+| `open_today` | `trip_id`, `activity_count` |
+| `complete_activity` | `activity_id`, `duration_seconds` |
+| `upload_attachment` | `activity_id`, `file_type`, `file_size` |
+| `view_attachment` | `attachment_id`, `source` |
+
+### System Telemetry
+- API error rate
+- Offline duration
+- Sync retry count
+
+## Development Setup
+
+### Tech Stack
+- **Frontend:** Preact + TypeScript + Vite + Tailwind CSS v4
+- **Backend:** Supabase (Auth, DB, Storage, Edge Functions)
+- **Runtime:** Bun
+
+### Project Structure
+```
+src/
+├── app/          # router, provider, layout
+├── features/     # Home, Trips, Today, Budget, Settings
+├── components/   # primitives, compounds, layouts
+├── hooks/        # custom hooks
+├── lib/          # supabase client, analytics
+├── types/        # TypeScript types
+└── styles/       # global styles
+```
+
+### Data Hooks
+- `useTrips`, `useTripDays`, `useActivities`, `useExpenses`, `useAttachments`
+- Library: SWR / React Query
+- Pattern: Optimistic updates
+
+### Environment Variables
+```bash
+VITE_SUPABASE_URL=<url>
+VITE_SUPABASE_ANON_KEY=<key>
+VITE_APP_VERSION=<version>
+VITE_POSTHOG_KEY=<key>  # optional
+```
+
+### Testing
+- **Unit:** Vitest + Testing Library Preact
+- **Mocks:** MSW สำหรับ Supabase
+- **Snapshot:** Skeleton/error states
+
+### Build & Deploy
+- **Scripts:** `bun run lint/test/build`
+- **Hosting:** Netlify/Vercel (static)
+- **Functions:** Supabase Edge Functions
+
+## Risks & Mitigations
+
+| Risk | Mitigation |
+|------|------------|
+| **Offline conflict → data loss** | Warning toast + `updated_at` tracking; R2: diff view |
+| **Performance บนมือถือ (large trips)** | List virtualization, lazy load, thumbnail ≤ 200KB |
+| **Shared token รั่วไหล** | Regenerate/revoke token, access logging |
+| **Storage quota** | จำกัดไฟล์/กิจกรรม, quota warning, cron ลบ orphan files |
+| **Analytics privacy** | Consent toggle, ไม่เก็บข้อมูลส่วนบุคคล |
+
+## Milestones & Acceptance Criteria
+
+### M1 (สัปดาห์ 2): Auth + Home + Create Trip
+**AC:** ผู้ใช้ใหม่ login → สร้างทริปแรกได้บนมือถือภายใน 2 นาที
+
+### M2 (สัปดาห์ 4): Trip Detail + Today + Budget + Attachment
+**AC:** เพิ่มกิจกรรม/ค่าใช้จ่ายได้, แนบใบเสร็จ, Today Mode แสดงกิจกรรมวันนี้
+
+### M3 (สัปดาห์ 6): Settings + Offline + Share
+**AC:** Offline mode อ่านข้อมูลได้, share token ใช้งานได้ + revoke ได้
+
+### M4 (สัปดาห์ 8): Collaborators + Maps + Conflict + Multi-attachments
+**AC:** Editor เพิ่มกิจกรรม/ไฟล์ได้, Maps deeplink ทำงาน, conflict alert แสดงถูกต้อง
+
+---
 
 ## Open Questions
-- ต้องการรองรับหลายภาษาใน UI ตั้งแต่ R1 หรือเริ่มเฉพาะไทย/อังกฤษ?
-- ขนาดไฟล์แนบสูงสุดควรเป็นเท่าไร และจำเป็นต้องรองรับ PDF/HEIC เพิ่มเติมหรือไม่?
-- สิทธิ์ editor ควรแก้ไข/ลบค่าใช้จ่ายและไฟล์แนบได้หรือจำกัดเฉพาะ owner?
-- ต้องมีรายงาน export (CSV/PDF) สำหรับสรุปค่าใช้จ่ายและไฟล์แนบหรือไม่?
-- จำเป็นต้องมีระบบแจ้งเตือน push/email สำหรับกิจกรรมล่วงหน้าหรือเตือนค่าใช้จ่ายหรือไม่?
+1. รองรับหลายภาษาใน R1 หรือเริ่มที่ TH/EN?
+2. ขนาดไฟล์แนบสูงสุด? รองรับ PDF/HEIC?
+3. Editor แก้ไข/ลบค่าใช้จ่ายและไฟล์แนบได้หรือไม่?
+4. ต้องการ export (CSV/PDF) สำหรับสรุปค่าใช้จ่าย?
+5. ต้องการ push/email notification?
