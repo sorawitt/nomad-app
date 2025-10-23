@@ -11,7 +11,7 @@
   }
 
   .soft-card {
-    @apply rounded-3xl border border-white/50 bg-white/60 p-5 backdrop-blur-xl;
+    @apply rounded-md border border-white/50 bg-white/60 p-5 backdrop-blur-xl;
   }
 
   .soft-chip {
@@ -27,7 +27,7 @@
   }
 
   .soft-list-item {
-    @apply flex items-center justify-between rounded-2xl border border-white/40 bg-white/50 px-4 py-3 text-sm text-slate-700 backdrop-blur;
+    @apply rounded-2xl border border-white/40 bg-white/50 px-4 py-3 text-sm text-slate-700 backdrop-blur;
   }
 
   .soft-empty {

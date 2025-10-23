@@ -1,5 +1,5 @@
 import NavBar from "../../../components/compounds/NavBar";
-import { ArrowUpRight, Calendar, ChevronLeft, MapPin, Share2 } from "lucide-preact";
+import { ArrowUpRight, Calendar, ChevronLeft, List, MapPin, Share2, Wallet } from "lucide-preact";
 import { format } from "date-fns";
 import { enUS } from "date-fns/locale";
 import { useState } from "preact/hooks";
@@ -48,7 +48,11 @@ export default function TripDetail(props: { id: string }) {
             endDate={endDate}
             destination={trip.destination}
           />
-          <TripItinerary tripDays={tripDays ?? []} tripId={trip.id} />
+          <TripItinerary
+            tripDays={tripDays ?? []}
+            tripId={trip.id}
+            currencyCode={trip.currency_code}
+          />
           <TripBudgetOverview spent={100000} budget={500000} />
         </div>
       </main>
@@ -90,7 +94,7 @@ function TripDetailHeader({
               </span>
             )}
             {hasDates && (
-              <span class="soft-chip">
+              <span class="soft-chip bg-zinc-200">
                 <Calendar class="h-3.5 w-3.5" />
                 {startDate} – {endDate}
               </span>
@@ -119,8 +123,30 @@ function DaysSkeleton() {
 interface TripItineraryProps {
   tripId: string;
   tripDays: TripDay[];
+  currencyCode?: string | null;
 }
-function TripItinerary({ tripId, tripDays }: TripItineraryProps) {
+
+function formatTripDayDate(date?: string | null) {
+  if (!date) return null;
+  const parsed = new Date(date);
+  if (Number.isNaN(parsed.getTime())) return null;
+  return format(parsed, "EEE, d MMM");
+}
+
+function formatCurrency(amount: number, currencyCode?: string | null) {
+  const code = currencyCode || "THB";
+  try {
+    return new Intl.NumberFormat(undefined, {
+      style: "currency",
+      currency: code,
+      maximumFractionDigits: 0,
+    }).format(amount);
+  } catch {
+    return `${code} ${Math.round(amount).toLocaleString()}`;
+  }
+}
+
+function TripItinerary({ tripId, tripDays, currencyCode }: TripItineraryProps) {
   return (
     <section>
       <div class="soft-card">
@@ -148,24 +174,41 @@ function TripItinerary({ tripId, tripDays }: TripItineraryProps) {
           </p>
         ) : (
           <ol class="soft-list mt-5">
-            {tripDays.map((day) => (
-              <li
-                key={day.id}
-                class="soft-list-item"
-              >
-                <div>
-                  <p class="text-xs font-semibold uppercase tracking-[0.14em] text-slate-400">
-                    Day {day.day_index + 1}
-                  </p>
-                  <p class="mt-0.5 text-sm font-medium capitalize text-slate-700">
+            {tripDays.map((day) => {
+              const dayDate = formatTripDayDate(day.date);
+              return (
+                <li
+                  key={day.id}
+                  class="soft-list-item flex flex-col gap-2"
+                >
+                  <div class="flex items-center gap-2 text-[11px] uppercase tracking-[0.18em] text-slate-400">
+                    <span class="soft-chip px-3 py-1 text-[11px] uppercase tracking-[0.18em] text-slate-600">
+                      Day {day.day_index + 1}
+                    </span>
+                    {dayDate && <span>{dayDate}</span>}
+                  </div>
+                  <p class="text-sm font-medium text-slate-700 capitalize">
                     {day.title}
                   </p>
-                </div>
-                <span class="soft-chip h-8 w-8 justify-center px-0 text-xs font-medium text-slate-500">
-                  {day.day_index + 1}
-                </span>
-              </li>
-            ))}
+                  <div class="flex flex-wrap items-center gap-3 text-xs text-slate-500">
+                    <span class="inline-flex items-center gap-1">
+                      <List class="h-3.5 w-3.5" />
+                      {day.activity_count === 0
+                        ? "No plans yet"
+                        : `${day.activity_count} ${
+                            day.activity_count === 1 ? "activity" : "activities"
+                          }`}
+                    </span>
+                    <span class="inline-flex items-center gap-1">
+                      <Wallet class="h-3.5 w-3.5" />
+                      {day.expense_total > 0
+                        ? formatCurrency(day.expense_total, currencyCode)
+                        : "No expenses"}
+                    </span>
+                  </div>
+                </li>
+              );
+            })}
           </ol>
         )}
       </div>
@@ -205,7 +248,7 @@ function TripBudgetOverview({ budget, spent }: TripBudgetOverviewProps) {
             />
           </div>
           <div class="flex flex-wrap items-center gap-2 text-sm text-slate-700">
-            <span class="text-[22px] font-semibold text-slate-900">
+            <span class="font-semibold text-slate-900">
               THB {spent.toLocaleString()}
             </span>
             <span class="text-slate-400">of</span>
