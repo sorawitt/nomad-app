@@ -1,5 +1,5 @@
 import NavBar from "../../../components/compounds/NavBar";
-import { ChevronLeft, Share2 } from "lucide-preact";
+import { ArrowUpRight, Calendar, ChevronLeft, MapPin, Share2 } from "lucide-preact";
 import { format } from "date-fns";
 import { enUS } from "date-fns/locale";
 import { useState } from "preact/hooks";
@@ -12,7 +12,7 @@ export default function TripDetail(props: { id: string }) {
 
   if (tripLoading || tripDaysLoading) {
     return (
-      <div class="min-h-screen bg-[#F8F7F4] text-[#37352F]">
+      <div class="min-h-screen bg-[#F5F6F8] text-slate-900">
         <NavBar title="Trip Detail" leftAction={<BackButton />} />
         <main class="mx-auto max-w-3xl px-5 py-8">
           <DaysSkeleton />
@@ -34,14 +34,14 @@ export default function TripDetail(props: { id: string }) {
     : "-";
 
   return (
-    <div class="min-h-screen bg-gray-50 text-zinc-900">
+    <div class="min-h-screen bg-[#F5F6F8] text-slate-900">
       <NavBar
         title={trip.title}
         leftAction={<BackButton />}
         rightAction={<ShareButton tripId={trip.id} tripTitle={trip.title} />}
       />
-      <main class="mx-auto max-w-3xl px-5 py-8 bg-white">
-        <div class="flex flex-col gap-8">
+      <main class="mx-auto max-w-3xl px-5 py-8">
+        <div class="flex flex-col gap-5">
           <TripDetailHeader
             title={trip.title}
             startDate={startDate}
@@ -68,18 +68,34 @@ function TripDetailHeader({
   endDate,
   destination,
 }: TripDetailHeaderProps) {
-  const metaParts = [
-    destination?.trim(),
-    startDate !== "-" && endDate !== "-" ? `${startDate} – ${endDate}` : undefined,
-  ].filter(Boolean);
+  const hasDestination = Boolean(destination?.trim());
+  const hasDates = startDate !== "-" && endDate !== "-";
 
   return (
-    <section class="first:pt-0">
-      <p class="text-[11px] uppercase tracking-[0.2em] text-[#A5A19B]">Overview</p>
-      <div class="mt-3 space-y-2">
-        <h1 class="text-[26px] font-medium leading-snug text-[#2F2B25]">{title}</h1>
-        {metaParts.length > 0 && (
-          <p class="text-sm text-[#6F6B64]">{metaParts.join(" · ")}</p>
+    <section class="">
+      <div class="">
+        <p class="text-[11px] font-medium uppercase tracking-[0.34em] text-slate-400">
+          Trip overview
+        </p>
+        <h1 class="mt-3 text-[26px] font-semibold leading-tight text-slate-900">
+          {title}
+        </h1>
+
+        {(hasDestination || hasDates) && (
+          <div class="mt-4 flex flex-wrap gap-2 text-[13px] text-slate-500">
+            {hasDestination && destination && (
+              <span class="inline-flex items-center gap-2 rounded-full bg-slate-100 text-slate-600">
+                <MapPin class="h-3.5 w-3.5" />
+                {destination}
+              </span>
+            )}
+            {hasDates && (
+              <span class="inline-flex items-center gap-2 rounded-full bg-slate-100 text-slate-600">
+                <Calendar class="h-3.5 w-3.5" />
+                {startDate} – {endDate}
+              </span>
+            )}
+          </div>
         )}
       </div>
     </section>
@@ -90,10 +106,10 @@ function DaysSkeleton() {
   return (
     <div class="flex flex-col gap-4">
       {Array.from({ length: 3 }).map((_, i) => (
-        <div class="space-y-3 border border-[#ECEAE4] bg-white p-4" key={i}>
-          <div class="h-3 w-28 bg-[#E4E2DC] animate-pulse" />
-          <div class="h-3 w-40 bg-[#E9E7E2] animate-pulse" />
-          <div class="h-24 bg-[#F4F2ED] animate-pulse" />
+        <div class="space-y-4 rounded-3xl border border-white/40 bg-white/50 p-5 backdrop-blur-lg" key={i}>
+          <div class="h-3 w-36 animate-pulse rounded-full bg-slate-100" />
+          <div class="h-3 w-28 animate-pulse rounded-full bg-slate-100/80" />
+          <div class="h-20 animate-pulse rounded-2xl bg-slate-100/60" />
         </div>
       ))}
     </div>
@@ -107,32 +123,52 @@ interface TripItineraryProps {
 function TripItinerary({ tripId, tripDays }: TripItineraryProps) {
   return (
     <section>
-      <header class="flex items-center justify-between text-[11px] uppercase tracking-[0.2em] text-[#A5A19B]">
-        <span>Itinerary</span>
-        <a
-          href={`/trip/itinerary/${tripId}`}
-          class="text-[10px] font-medium tracking-[0.18em] text-[#86837E] transition hover:text-[#5E5B55]"
-        >
-          View all
-        </a>
-      </header>
+      <div class="rounded border border-white/50 bg-white/60 p-5 backdrop-blur-xl">
+        <header class="flex items-center justify-between">
+          <div>
+            <p class="text-[11px] font-medium uppercase tracking-[0.34em] text-slate-400">
+              Itinerary
+            </p>
+            <p class="mt-1 text-[15px] font-semibold text-slate-800">
+              Snapshot of your upcoming days
+            </p>
+          </div>
+          <a
+            href={`/trip/itinerary/${tripId}`}
+            class="inline-flex items-center gap-1 rounded-full border border-slate-900/10 bg-slate-900 px-3 py-1.5 text-[11px] font-medium uppercase tracking-[0.2em] text-white transition hover:bg-slate-900/80"
+          >
+            View all
+            <ArrowUpRight class="h-3.5 w-3.5" />
+          </a>
+        </header>
 
-      {tripDays.length === 0 ? (
-        <p class="mt-4 rounded-none border border-[#ECEAE4] bg-white p-4 text-sm text-[#AAA79F]">
-          No itinerary yet. Start planning to see your days appear here.
-        </p>
-      ) : (
-        <ol class="mt-4 space-y-1 border-l border-[#E3E0D9] pl-4">
-          {tripDays.map((day) => (
-            <li key={day.id} class="flex flex-col gap-0.5 text-sm text-[#37352F]">
-              <span class="font-medium">
-                Day {day.day_index + 1}
-              </span>
-              <span class="text-[#6F6B64] capitalize">{day.title}</span>
-            </li>
-          ))}
-        </ol>
-      )}
+        {tripDays.length === 0 ? (
+          <p class="mt-5 rounded-2xl border border-dashed border-slate-200 bg-white/40 px-4 py-6 text-center text-sm text-slate-400 backdrop-blur">
+            No itinerary yet. Start planning to see your days appear here.
+          </p>
+        ) : (
+          <ol class="mt-5 space-y-2.5">
+            {tripDays.map((day) => (
+              <li
+                key={day.id}
+                class="flex items-center justify-between rounded-2xl border border-white/40 bg-white/40 px-4 py-3 text-sm text-slate-700 backdrop-blur"
+              >
+                <div>
+                  <p class="text-xs font-semibold uppercase tracking-[0.14em] text-slate-400">
+                    Day {day.day_index + 1}
+                  </p>
+                  <p class="mt-0.5 text-sm font-medium capitalize text-slate-700">
+                    {day.title}
+                  </p>
+                </div>
+                <span class="inline-flex h-8 w-8 items-center justify-center rounded-full border border-white/40 bg-white/60 text-xs font-medium text-slate-500">
+                  {day.day_index + 1}
+                </span>
+              </li>
+            ))}
+          </ol>
+        )}
+      </div>
     </section>
   );
 }
@@ -147,20 +183,35 @@ function TripBudgetOverview({ budget, spent }: TripBudgetOverviewProps) {
 
   return (
     <section>
-      <header class="flex items-center justify-between text-[11px] uppercase tracking-[0.2em] text-[#A5A19B]">
-        <span>Budget</span>
-        <span class="text-[10px] text-[#86837E]">{progress}%</span>
-      </header>
-      <div class="mt-4 space-y-2">
-        <div class="relative h-1 bg-[#ECEAE4] rounded-full">
-          <div
-            class="absolute inset-y-0 left-0 bg-emerald-500 transition-[width] duration-300 rounded-full"
-            style={{ width: `${progress}%` }}
-          />
+      <div class="rounded border border-white/50 bg-white/60 p-5 backdrop-blur-xl">
+        <header class="flex items-center justify-between">
+          <div>
+            <p class="text-[11px] font-medium uppercase tracking-[0.34em] text-slate-400">
+              Budget
+            </p>
+            <p class="mt-1 text-[15px] font-semibold text-slate-800">
+              Spending snapshot
+            </p>
+          </div>
+          <span class="inline-flex items-center gap-2 rounded-full border border-emerald-500/20 bg-emerald-100/60 px-3 py-1 text-xs font-semibold text-emerald-700">
+            {progress}% used
+          </span>
+        </header>
+        <div class="mt-5 space-y-3">
+          <div class="relative h-2 overflow-hidden rounded-full bg-slate-100/70">
+            <div
+              class="absolute inset-y-0 left-0 rounded-full bg-green-500 transition-[width] duration-300"
+              style={{ width: `${progress}%` }}
+            />
+          </div>
+          <div class="flex flex-wrap items-center gap-2 text-sm text-slate-700">
+            <span class="text-[22px] font-semibold text-slate-900">
+              THB {spent.toLocaleString()}
+            </span>
+            <span class="text-slate-400">of</span>
+            <span>THB {budget.toLocaleString()}</span>
+          </div>
         </div>
-        <p class="text-sm text-[#37352F]">
-          THB {spent.toLocaleString()} <span class="text-[#86837E]">/ {budget.toLocaleString()}</span>
-        </p>
       </div>
     </section>
   );
@@ -169,7 +220,7 @@ function TripBudgetOverview({ budget, spent }: TripBudgetOverviewProps) {
 function BackButton() {
   return (
     <button
-      class="flex h-8 w-8 items-center justify-center text-[#6F6B64] transition hover:text-[#37352F]"
+      class="flex h-9 w-9 items-center justify-center rounded-full border border-white/40 bg-white/60 text-[#6F6B64] transition hover:text-[#37352F] backdrop-blur"
       onClick={() => history.back()}
       type="button"
       aria-label="Back"
@@ -219,7 +270,7 @@ function ShareButton({ tripId, tripTitle }: ShareButtonProps) {
 
   return (
     <button
-      class="flex h-8 w-8 items-center justify-center text-[#6F6B64] transition hover:text-[#37352F]"
+      class="flex h-9 w-9 items-center justify-center rounded-full border border-white/40 bg-white/60 text-[#6F6B64] transition hover:text-[#37352F] backdrop-blur"
       type="button"
       onClick={handleShare}
       aria-label="Share trip"
