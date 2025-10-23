@@ -1,15 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '../../../lib/supabase';
-
-export type Trip = {
-  id: string;
-  title: string;
-  start_date: string;
-  end_date: string;
-  updated_at: string;
-  owner_id: string;
-  activity_count?: number;
-};
+import type { Trip } from '../../../types/models';
 
 export function useTrips() {
   return useQuery({
@@ -23,17 +14,12 @@ export function useTrips() {
           start_date,
           end_date,
           updated_at,
-          owner_id,
-          activities(count)
+          owner_id
         `)
         .order('updated_at', { ascending: false });
 
       if (error) throw error;
-
-      return data.map((trip) => ({
-        ...trip,
-        activity_count: trip.activities?.[0]?.count ?? 0,
-      })) as Trip[];
+      return data as Trip[];
     },
     staleTime: 1000 * 60 * 5, // 5 minutes
   });

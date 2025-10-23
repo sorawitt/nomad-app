@@ -1,18 +1,18 @@
+import { route } from "preact-router"
 import type { Trip } from "../../types/models"
 import TripCard from "../compounds/TripCard"
-
 interface TripListProps {
     title: string
-    trips: Trip[]
+    trips: Trip[] | undefined
 }
 export default function TripList({ title, trips }: TripListProps) {
     return (
         <div class='p-4'>
             <h1 class='text-xs font-semibold text-gray-400 mb-2'>{title}</h1>
             <div class='space-y-2'>
-                {
+                { trips &&
                     trips.map((trip) => (
-                        <TripCard key={trip.id} trip={trip} />
+                        <TripCard key={trip.id} trip={trip} onClick={() => route(`/trip/${trip.id}`)} /> 
                     ))
                 }
             </div>

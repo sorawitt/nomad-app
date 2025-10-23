@@ -1,18 +1,10 @@
-export interface Trip {
-  id: string
-  title: string
-  destination: string
-  startDate: string
-  endDate: string
-  budget: number
-  spent: number
-  activities: Activity[]
-}
-
-export interface Activity {
-  id: string
-  title: string
-  date: string
-  cost: number
-  completed: boolean
-}
+export type Trip = {
+  id: string;
+  title: string;
+  start_date: string;
+  end_date: string;
+  updated_at: string;
+  owner_id: string;
+  currency_code?: string;
+  activity_count?: number;
+};

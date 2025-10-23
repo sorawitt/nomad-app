@@ -1,46 +1,68 @@
 import type { TargetedEvent } from 'preact'
 import { useState } from 'preact/hooks'
+import { route } from 'preact-router'
+import { useCreateTrip } from './hooks/useCreateTrip'
 
 const FORM_ID = 'new-trip-form'
 
-const mockCreateTrip = async (data: any) => {
-    return new Promise((resolve, reject) => {
-        setTimeout(() => {
-            // 90% success, 10% fail (for demo)
-            if (Math.random() > 0.9) {
-                resolve({ id: Date.now(), ...data })
-            } else {
-                reject(new Error('Network error'))
-            }
-        }, 1000)
-    })
-}
-
 export default function NewTrip() {
-    const [title, setTitle] = useState('')
-    const [destination, setDestination] = useState('')
-    const [startDate, setStartDate] = useState('')
-    const [endDate, setEndDate] = useState('')
-    const [isLoading, setIsLoading] = useState(false)
-    const [error, setError] = useState('')
+    const createTrip = useCreateTrip()
 
-    const isFormValid = title && destination && startDate && endDate && startDate <= endDate
+    const [formData, setFormData] = useState({
+        title: '',
+        destination: '',
+        start_date: '',
+        end_date: '',
+        currency_code: 'THB',
+    })
+    const [errors, setErrors] = useState<Record<string, string>>({})
+
+    const validate = () => {
+        const newErrors: Record<string, string> = {}
+
+        if (!formData.title.trim()) {
+            newErrors.title = 'Trip title is required'
+        }
+
+        if (!formData.destination.trim()) {
+            newErrors.destination = 'Destination is required'
+        }
+
+        if (!formData.start_date) {
+            newErrors.start_date = 'Start date is required'
+        }
+
+        if (!formData.end_date) {
+            newErrors.end_date = 'End date is required'
+        }
+
+        if (formData.start_date && formData.end_date) {
+            if (new Date(formData.start_date) > new Date(formData.end_date)) {
+                newErrors.end_date = 'End date must be after start date'
+            }
+        }
+
+        setErrors(newErrors)
+        return Object.keys(newErrors).length === 0
+    }
+
+    const isFormValid = 
+        formData.title && 
+        formData.destination && 
+        formData.start_date && 
+        formData.end_date && 
+        formData.start_date <= formData.end_date
 
     const handleSubmit = async (e: TargetedEvent<HTMLFormElement>) => {
         e.preventDefault()
-        if (!isFormValid) return
+        
+        if (!validate()) return
 
-        setIsLoading(true)
-        setError('')
         try {
-            const result = await mockCreateTrip({ title, destination, startDate, endDate })
-            console.log('Trip created:', result)
-            // TODO: navigate to trip details page
-            alert(`✓ Trip created! ID: ${result}`)
-        } catch (err) {
-            setError(err instanceof Error ? err.message : 'Failed to create trip')
-        } finally {
-            setIsLoading(false)
+            const tripId = await createTrip.mutateAsync(formData)
+            route(`/trip/${tripId}`, true) // true = replace history
+        } catch (error) {
+            console.error('Failed to create trip:', error)
         }
     }
 
@@ -65,43 +87,63 @@ export default function NewTrip() {
                     <section>
                         <h2 class="mb-3 text-xs font-semibold tracking-wider text-gray-400">TRIP DETAILS</h2>
                         <div class="space-y-3">
-                            <input
-                                type="text"
-                                placeholder="Thailand Explorer"
-                                class="input-field"
-                                value={title}
-                                onInput={(e) => setTitle((e.target as HTMLInputElement).value)}
-                            />
+                            <div>
+                                <input
+                                    type="text"
+                                    placeholder="Thailand Explorer"
+                                    class={`input-field ${errors.title ? 'border-red-500' : ''}`}
+                                    value={formData.title}
+                                    onInput={(e) => setFormData({ ...formData, title: (e.target as HTMLInputElement).value })}
+                                />
+                                {errors.title && (
+                                    <p class="mt-1 text-xs text-red-600">{errors.title}</p>
+                                )}
+                            </div>
 
-                            <input
-                                type="text"
-                                placeholder="Bangkok, Thailand"
-                                class="input-field"
-                                value={destination}
-                                onInput={(e) => setDestination((e.target as HTMLInputElement).value)}
-                            />
+                            <div>
+                                <input
+                                    type="text"
+                                    placeholder="Bangkok, Thailand"
+                                    class={`input-field ${errors.destination ? 'border-red-500' : ''}`}
+                                    value={formData.destination}
+                                    onInput={(e) => setFormData({ ...formData, destination: (e.target as HTMLInputElement).value })}
+                                />
+                                {errors.destination && (
+                                    <p class="mt-1 text-xs text-red-600">{errors.destination}</p>
+                                )}
+                            </div>
 
-                            <input
-                                type="date"
-                                class="input-field"
-                                value={startDate}
-                                max={endDate || undefined}
-                                onInput={(e) => setStartDate((e.target as HTMLInputElement).value)}
-                            />
+                            <div>
+                                <input
+                                    type="date"
+                                    class={`input-field ${errors.start_date ? 'border-red-500' : ''}`}
+                                    value={formData.start_date}
+                                    max={formData.end_date || undefined}
+                                    onInput={(e) => setFormData({ ...formData, start_date: (e.target as HTMLInputElement).value })}
+                                />
+                                {errors.start_date && (
+                                    <p class="mt-1 text-xs text-red-600">{errors.start_date}</p>
+                                )}
+                            </div>
 
-                            <input
-                                type="date"
-                                class="input-field"
-                                value={endDate}
-                                min={startDate || undefined}
-                                onInput={(e) => setEndDate((e.target as HTMLInputElement).value)}
-                            />
+                            <div>
+                                <input
+                                    type="date"
+                                    class={`input-field ${errors.end_date ? 'border-red-500' : ''}`}
+                                    value={formData.end_date}
+                                    min={formData.start_date || undefined}
+                                    onInput={(e) => setFormData({ ...formData, end_date: (e.target as HTMLInputElement).value })}
+                                />
+                                {errors.end_date && (
+                                    <p class="mt-1 text-xs text-red-600">{errors.end_date}</p>
+                                )}
+                            </div>
                         </div>
                     </section>
 
-                    {error && (
+                    {createTrip.error && (
                         <div class="rounded-md bg-red-50 p-3 text-sm text-red-700">
-                            {error}
+                            {createTrip.error instanceof Error ? createTrip.error.message : 'Failed to create trip'}
                         </div>
                     )}
 
@@ -114,9 +156,9 @@ export default function NewTrip() {
                     class="btn-primary w-full py-3 text-sm font-medium disabled:opacity-40"
                     form={FORM_ID}
                     type="submit"
-                    disabled={!isFormValid || isLoading}
+                    disabled={!isFormValid || createTrip.isPending}
                 >
-                    {isLoading ? 'Creating...' : 'Create Trip'}
+                    {createTrip.isPending ? 'Creating...' : 'Create Trip'}
                 </button>
             </footer>
         </div>

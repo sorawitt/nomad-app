@@ -6,6 +6,7 @@ import AuthScreen from '../features/auth/AuthScreen';
 import AuthCallback from '../features/auth/AuthCallback';
 import Home from '../features/home/home';
 import NewTrip from '../features/trips/NewTrip';
+import TripDetail from '../features/trips/detail/TripDetail';
 
 const queryClient = new QueryClient();
 
@@ -35,6 +36,7 @@ export function AppRouter() {
           <Route path="/" component={ProtectedHome} />
           <Route path="/trips/new" component={NewTrip} />
           <Route default component={NotFound} />
+          <Route path="/trip/:id" component={TripDetail} />
           <Route path="/auth/callback" component={AuthCallback} />
         </Router>
       </AuthProvider>
