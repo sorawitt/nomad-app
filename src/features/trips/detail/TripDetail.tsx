@@ -46,7 +46,7 @@ export default function TripDetail(props: { id: string }) {
             title={trip.title}
             startDate={startDate}
             endDate={endDate}
-            destination={trip.title}
+            destination={trip.destination}
           />
           <TripItinerary tripDays={tripDays ?? []} tripId={trip.id} />
           <TripBudgetOverview spent={100000} budget={500000} />
@@ -72,8 +72,8 @@ function TripDetailHeader({
   const hasDates = startDate !== "-" && endDate !== "-";
 
   return (
-    <section class="">
-      <div class="">
+    <section>
+      <div class="soft-card">
         <p class="text-[11px] font-medium uppercase tracking-[0.34em] text-slate-400">
           Trip overview
         </p>
@@ -84,13 +84,13 @@ function TripDetailHeader({
         {(hasDestination || hasDates) && (
           <div class="mt-4 flex flex-wrap gap-2 text-[13px] text-slate-500">
             {hasDestination && destination && (
-              <span class="inline-flex items-center gap-2 rounded-full bg-slate-100 text-slate-600">
+              <span class="soft-chip">
                 <MapPin class="h-3.5 w-3.5" />
                 {destination}
               </span>
             )}
             {hasDates && (
-              <span class="inline-flex items-center gap-2 rounded-full bg-slate-100 text-slate-600">
+              <span class="soft-chip">
                 <Calendar class="h-3.5 w-3.5" />
                 {startDate} – {endDate}
               </span>
@@ -106,7 +106,7 @@ function DaysSkeleton() {
   return (
     <div class="flex flex-col gap-4">
       {Array.from({ length: 3 }).map((_, i) => (
-        <div class="space-y-4 rounded-3xl border border-white/40 bg-white/50 p-5 backdrop-blur-lg" key={i}>
+        <div class="soft-card space-y-4" key={i}>
           <div class="h-3 w-36 animate-pulse rounded-full bg-slate-100" />
           <div class="h-3 w-28 animate-pulse rounded-full bg-slate-100/80" />
           <div class="h-20 animate-pulse rounded-2xl bg-slate-100/60" />
@@ -123,7 +123,7 @@ interface TripItineraryProps {
 function TripItinerary({ tripId, tripDays }: TripItineraryProps) {
   return (
     <section>
-      <div class="rounded border border-white/50 bg-white/60 p-5 backdrop-blur-xl">
+      <div class="soft-card">
         <header class="flex items-center justify-between">
           <div>
             <p class="text-[11px] font-medium uppercase tracking-[0.34em] text-slate-400">
@@ -135,7 +135,7 @@ function TripItinerary({ tripId, tripDays }: TripItineraryProps) {
           </div>
           <a
             href={`/trip/itinerary/${tripId}`}
-            class="inline-flex items-center gap-1 rounded-full border border-slate-900/10 bg-slate-900 px-3 py-1.5 text-[11px] font-medium uppercase tracking-[0.2em] text-white transition hover:bg-slate-900/80"
+            class="soft-cta"
           >
             View all
             <ArrowUpRight class="h-3.5 w-3.5" />
@@ -143,15 +143,15 @@ function TripItinerary({ tripId, tripDays }: TripItineraryProps) {
         </header>
 
         {tripDays.length === 0 ? (
-          <p class="mt-5 rounded-2xl border border-dashed border-slate-200 bg-white/40 px-4 py-6 text-center text-sm text-slate-400 backdrop-blur">
+          <p class="soft-empty mt-5">
             No itinerary yet. Start planning to see your days appear here.
           </p>
         ) : (
-          <ol class="mt-5 space-y-2.5">
+          <ol class="soft-list mt-5">
             {tripDays.map((day) => (
               <li
                 key={day.id}
-                class="flex items-center justify-between rounded-2xl border border-white/40 bg-white/40 px-4 py-3 text-sm text-slate-700 backdrop-blur"
+                class="soft-list-item"
               >
                 <div>
                   <p class="text-xs font-semibold uppercase tracking-[0.14em] text-slate-400">
@@ -161,7 +161,7 @@ function TripItinerary({ tripId, tripDays }: TripItineraryProps) {
                     {day.title}
                   </p>
                 </div>
-                <span class="inline-flex h-8 w-8 items-center justify-center rounded-full border border-white/40 bg-white/60 text-xs font-medium text-slate-500">
+                <span class="soft-chip h-8 w-8 justify-center px-0 text-xs font-medium text-slate-500">
                   {day.day_index + 1}
                 </span>
               </li>
@@ -183,7 +183,7 @@ function TripBudgetOverview({ budget, spent }: TripBudgetOverviewProps) {
 
   return (
     <section>
-      <div class="rounded border border-white/50 bg-white/60 p-5 backdrop-blur-xl">
+      <div class="soft-card">
         <header class="flex items-center justify-between">
           <div>
             <p class="text-[11px] font-medium uppercase tracking-[0.34em] text-slate-400">
@@ -198,9 +198,9 @@ function TripBudgetOverview({ budget, spent }: TripBudgetOverviewProps) {
           </span>
         </header>
         <div class="mt-5 space-y-3">
-          <div class="relative h-2 overflow-hidden rounded-full bg-slate-100/70">
+          <div class="soft-progress">
             <div
-              class="absolute inset-y-0 left-0 rounded-full bg-green-500 transition-[width] duration-300"
+              class="soft-progress-bar"
               style={{ width: `${progress}%` }}
             />
           </div>
@@ -220,7 +220,7 @@ function TripBudgetOverview({ budget, spent }: TripBudgetOverviewProps) {
 function BackButton() {
   return (
     <button
-      class="flex h-9 w-9 items-center justify-center rounded-full border border-white/40 bg-white/60 text-[#6F6B64] transition hover:text-[#37352F] backdrop-blur"
+      class="soft-icon-btn"
       onClick={() => history.back()}
       type="button"
       aria-label="Back"
@@ -270,7 +270,7 @@ function ShareButton({ tripId, tripTitle }: ShareButtonProps) {
 
   return (
     <button
-      class="flex h-9 w-9 items-center justify-center rounded-full border border-white/40 bg-white/60 text-[#6F6B64] transition hover:text-[#37352F] backdrop-blur"
+      class="soft-icon-btn"
       type="button"
       onClick={handleShare}
       aria-label="Share trip"

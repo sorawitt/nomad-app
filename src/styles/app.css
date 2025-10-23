@@ -9,4 +9,40 @@
   .input-field {
     @apply w-full rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm text-gray-900 placeholder-gray-400 transition-colors duration-150 hover:border-gray-200 hover:bg-white focus:outline-none focus-visible:border-gray-900 focus-visible:ring-0 disabled:cursor-not-allowed disabled:bg-gray-100 disabled:text-gray-500;
   }
+
+  .soft-card {
+    @apply rounded-3xl border border-white/50 bg-white/60 p-5 backdrop-blur-xl;
+  }
+
+  .soft-chip {
+    @apply inline-flex items-center gap-2 rounded-full bg-slate-100/80 px-3 py-1 text-[13px] text-slate-600;
+  }
+
+  .soft-cta {
+    @apply inline-flex items-center gap-1 rounded-full border border-slate-900/10 bg-slate-900 px-3 py-1.5 text-[11px] font-medium uppercase tracking-[0.2em] text-white transition hover:bg-slate-900/80;
+  }
+
+  .soft-list {
+    @apply space-y-2.5;
+  }
+
+  .soft-list-item {
+    @apply flex items-center justify-between rounded-2xl border border-white/40 bg-white/50 px-4 py-3 text-sm text-slate-700 backdrop-blur;
+  }
+
+  .soft-empty {
+    @apply rounded-2xl border border-dashed border-slate-200 bg-white/40 px-4 py-6 text-center text-sm text-slate-400 backdrop-blur;
+  }
+
+  .soft-icon-btn {
+    @apply flex h-9 w-9 items-center justify-center rounded-full border border-white/40 bg-white/60 text-[#6F6B64] transition hover:text-[#37352F] backdrop-blur;
+  }
+
+  .soft-progress {
+    @apply relative h-2 overflow-hidden rounded-full bg-slate-100/70;
+  }
+
+  .soft-progress-bar {
+    @apply absolute inset-y-0 left-0 rounded-full bg-green-500 transition-[width] duration-300;
+  }
 }
