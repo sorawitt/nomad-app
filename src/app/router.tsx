@@ -1,4 +1,4 @@
-import { Router, Route } from 'preact-router';
+import { Router, Route, route } from 'preact-router';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { AuthProvider } from './provider';
 import { ProtectedRoute, GuestRoute } from './guards';
@@ -8,7 +8,28 @@ import Home from '../features/home/home';
 import NewTrip from '../features/trips/NewTrip';
 import TripDetail from '../features/trips/detail/TripDetail';
 
-const queryClient = new QueryClient();
+// Configure QueryClient with global error handling
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      retry: (failureCount, error: any) => {
+        // Don't retry on 401/403 errors
+        if (error?.status === 401 || error?.status === 403) {
+          return false;
+        }
+        return failureCount < 3;
+      }
+    },
+    mutations: {
+      onError: (error: any) => {
+        // Redirect to login on unauthorized errors
+        if (error?.status === 401 || error?.code === 'PGRST301') {
+          route('/auth', true);
+        }
+      },
+    },
+  },
+});
 
 function NotFound() {
   return <div class="p-8 text-center">Not Found</div>;
@@ -27,6 +48,18 @@ const GuestAuth = () => (
   </GuestRoute>
 );
 
+const ProtectedTripDetail = ({ id }: { id: string }) => (
+  <ProtectedRoute>
+    <TripDetail id={id} />
+  </ProtectedRoute>
+);
+
+const ProtectedNewTrip = () => (
+  <ProtectedRoute>
+    <NewTrip />
+  </ProtectedRoute>
+);
+
 export function AppRouter() {
   return (
     <QueryClientProvider client={queryClient}>
@@ -34,9 +67,9 @@ export function AppRouter() {
         <Router>
           <Route path="/auth" component={GuestAuth} />
           <Route path="/" component={ProtectedHome} />
-          <Route path="/trips/new" component={NewTrip} />
+          <Route path="/trips/new" component={ProtectedNewTrip} />
           <Route default component={NotFound} />
-          <Route path="/trip/:id" component={TripDetail} />
+          <Route path="/trip/:id" component={ProtectedTripDetail} />
           <Route path="/auth/callback" component={AuthCallback} />
         </Router>
       </AuthProvider>
