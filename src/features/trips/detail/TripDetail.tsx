@@ -1,5 +1,8 @@
+import NavBar from "../../../components/compounds/NavBar";
+import { ChevronLeft, Share2 } from "lucide-preact";
 import { format } from "date-fns";
 import { enUS } from "date-fns/locale";
+import { useState } from "preact/hooks";
 import { useTripDetail } from "./hooks/useTripDetail";
 import { useTripDays, type TripDay } from "./hooks/useTripDays";
 
@@ -10,14 +13,7 @@ export default function TripDetail(props: { id: string }) {
   if (tripLoading || tripDaysLoading) {
     return (
       <div class="min-h-screen bg-[#F8F7F4] text-[#37352F]">
-        <header class="border-b border-[#E9E7E2] bg-white/80 backdrop-blur">
-          <div class="mx-auto max-w-3xl px-5">
-            <div class="relative flex items-center justify-center py-4">
-              <div class="absolute left-0 h-3 w-16 rounded bg-[#E4E2DC] animate-pulse" />
-              <div class="h-3 w-24 rounded bg-[#E9E7E2] animate-pulse" />
-            </div>
-          </div>
-        </header>
+        <NavBar title="Trip Detail" leftAction={<BackButton />} />
         <main class="mx-auto max-w-3xl px-5 py-8">
           <DaysSkeleton />
         </main>
@@ -29,39 +25,28 @@ export default function TripDetail(props: { id: string }) {
     return <div>Trip not found</div>;
   }
 
-  const timeStr = trip.start_date
-    ? format(new Date(trip.start_date), "d MMMM yyyy", { locale: enUS })
+  const startDate = trip.start_date
+    ? format(new Date(trip.start_date), "d MMM yyyy", { locale: enUS })
     : "-";
 
-  const timeEnd = trip.end_date
-    ? format(new Date(trip.end_date), "d MMMM yyyy", { locale: enUS })
+  const endDate = trip.end_date
+    ? format(new Date(trip.end_date), "d MMM yyyy", { locale: enUS })
     : "-";
 
   return (
     <div class="min-h-screen bg-gray-50 text-zinc-900">
-      <header class="sticky top-0 z-10 border-b border-[#E9E7E2] bg-white/85 backdrop-blur">
-        <div class="mx-auto max-w-3xl px-5">
-          <div class="relative flex items-center justify-center py-4">
-            <button
-              class="absolute left-0 flex items-center gap-2 text-sm text-[#86837E] transition hover:text-[#37352F]"
-              onClick={() => history.back()}
-              type="button"
-              aria-label="Back"
-            >
-              <span class="text-lg leading-none">←</span>
-              <span>Back</span>
-            </button>
-            <span class="text-sm font-medium text-[#86837E]">Trip Detail</span>
-          </div>
-        </div>
-      </header>
-      <main class="mx-auto max-w-3xl px-5 py-8">
-        <div class="flex flex-col divide-y divide-[#E9E7E2]">
+      <NavBar
+        title={trip.title}
+        leftAction={<BackButton />}
+        rightAction={<ShareButton tripId={trip.id} tripTitle={trip.title} />}
+      />
+      <main class="mx-auto max-w-3xl px-5 py-8 bg-white">
+        <div class="flex flex-col gap-8">
           <TripDetailHeader
             title={trip.title}
-            startDate={timeStr}
-            endDate={timeEnd}
-            badges={["taiwan", "trip"]}
+            startDate={startDate}
+            endDate={endDate}
+            destination={trip.title}
           />
           <TripItinerary tripDays={tripDays ?? []} tripId={trip.id} />
           <TripBudgetOverview spent={100000} budget={500000} />
@@ -75,54 +60,40 @@ interface TripDetailHeaderProps {
   title: string;
   startDate: string;
   endDate: string;
-  badges?: string[];
+  destination?: string | null;
 }
 function TripDetailHeader({
   title,
   startDate,
   endDate,
-  badges,
+  destination,
 }: TripDetailHeaderProps) {
-  return (
-    <section class="py-8 first:pt-0">
-      <span class="text-[11px] uppercase tracking-[0.18em] text-[#86837E]">
-        Overview
-      </span>
-      <div class="mt-5 space-y-2">
-        <h1 class="text-[28px] font-medium leading-tight text-[#37352F]">
-          {title}
-        </h1>
-        <p class="text-sm text-[#8F8C86]">
-          {startDate} {'-'} {endDate}
-        </p>
-      </div>
-      {badges && badges.length > 0 && (
-        <div class="mt-5 flex flex-wrap gap-2">
-          {badges.map((badge) => (
-            <Badge text={badge} key={badge} />
-          ))}
-        </div>
-      )}
-    </section>
-  );
-}
+  const metaParts = [
+    destination?.trim(),
+    startDate !== "-" && endDate !== "-" ? `${startDate} – ${endDate}` : undefined,
+  ].filter(Boolean);
 
-function Badge({ text }: { text: string }) {
   return (
-    <span class="inline-flex items-center gap-2 rounded-full border border-[#E3E0D9] px-3 py-1 text-[10px] uppercase tracking-[0.14em] text-[#86837E]">
-      {text}
-    </span>
+    <section class="first:pt-0">
+      <p class="text-[11px] uppercase tracking-[0.2em] text-[#A5A19B]">Overview</p>
+      <div class="mt-3 space-y-2">
+        <h1 class="text-[26px] font-medium leading-snug text-[#2F2B25]">{title}</h1>
+        {metaParts.length > 0 && (
+          <p class="text-sm text-[#6F6B64]">{metaParts.join(" · ")}</p>
+        )}
+      </div>
+    </section>
   );
 }
 
 function DaysSkeleton() {
   return (
-    <div class="flex flex-col divide-y divide-[#E9E7E2]">
+    <div class="flex flex-col gap-4">
       {Array.from({ length: 3 }).map((_, i) => (
-        <div class="py-8 first:pt-0" key={i}>
-          <div class="h-3 w-24 rounded bg-[#E4E2DC] animate-pulse" />
-          <div class="mt-4 h-3 w-40 rounded bg-[#E9E7E2] animate-pulse" />
-          <div class="mt-5 h-14 rounded bg-[#F2F1EC] animate-pulse" />
+        <div class="space-y-3 border border-[#ECEAE4] bg-white p-4" key={i}>
+          <div class="h-3 w-28 bg-[#E4E2DC] animate-pulse" />
+          <div class="h-3 w-40 bg-[#E9E7E2] animate-pulse" />
+          <div class="h-24 bg-[#F4F2ED] animate-pulse" />
         </div>
       ))}
     </div>
@@ -135,31 +106,29 @@ interface TripItineraryProps {
 }
 function TripItinerary({ tripId, tripDays }: TripItineraryProps) {
   return (
-    <section class="py-8">
-      <header class="flex items-center justify-between">
-        <span class="text-[11px] uppercase tracking-[0.18em] text-[#86837E]">
-          Itinerary
-        </span>
+    <section>
+      <header class="flex items-center justify-between text-[11px] uppercase tracking-[0.2em] text-[#A5A19B]">
+        <span>Itinerary</span>
         <a
           href={`/trip/itinerary/${tripId}`}
-          class="text-xs text-[#86837E] transition hover:text-[#5E5B55]"
+          class="text-[10px] font-medium tracking-[0.18em] text-[#86837E] transition hover:text-[#5E5B55]"
         >
-          View full itinerary
+          View all
         </a>
       </header>
 
       {tripDays.length === 0 ? (
-        <p class="mt-5 text-sm text-[#AAA79F]">
+        <p class="mt-4 rounded-none border border-[#ECEAE4] bg-white p-4 text-sm text-[#AAA79F]">
           No itinerary yet. Start planning to see your days appear here.
         </p>
       ) : (
-        <ol class="mt-5 space-y-2 border-l border-[#E3E0D9] pl-4">
+        <ol class="mt-4 space-y-1 border-l border-[#E3E0D9] pl-4">
           {tripDays.map((day) => (
-            <li key={day.id}>
-              <p class="text-sm font-medium text-[#37352F]">
+            <li key={day.id} class="flex flex-col gap-0.5 text-sm text-[#37352F]">
+              <span class="font-medium">
                 Day {day.day_index + 1}
-              </p>
-              <p class="text-sm text-[#8F8C86] capitalize">{day.title}</p>
+              </span>
+              <span class="text-[#6F6B64] capitalize">{day.title}</span>
             </li>
           ))}
         </ol>
@@ -177,25 +146,86 @@ function TripBudgetOverview({ budget, spent }: TripBudgetOverviewProps) {
   const progress = total > 0 ? Math.min(100, Math.round((spent / total) * 100)) : 0;
 
   return (
-    <section class="py-8">
-      <header class="flex flex-wrap items-center gap-4">
-        <span class="text-[11px] uppercase tracking-[0.18em] text-[#86837E]">
-          Budget
-        </span>
-        <div class="h-px flex-1 bg-[#E9E7E2]" />
-        <span class="text-xs text-[#86837E]">{progress}%</span>
+    <section>
+      <header class="flex items-center justify-between text-[11px] uppercase tracking-[0.2em] text-[#A5A19B]">
+        <span>Budget</span>
+        <span class="text-[10px] text-[#86837E]">{progress}%</span>
       </header>
-      <div class="mt-4 flex items-center gap-3">
-        <div class="relative h-1 flex-1 overflow-hidden rounded-full bg-[#E9E7E2]">
+      <div class="mt-4 space-y-2">
+        <div class="relative h-1 bg-[#ECEAE4] rounded-full">
           <div
-            class="absolute inset-0 rounded-full bg-[#37352F] transition-[width] duration-300"
+            class="absolute inset-y-0 left-0 bg-emerald-500 transition-[width] duration-300 rounded-full"
             style={{ width: `${progress}%` }}
           />
         </div>
-        <span class="text-xs text-[#86837E]">
-          THB {spent.toLocaleString()} / {budget.toLocaleString()}
-        </span>
+        <p class="text-sm text-[#37352F]">
+          THB {spent.toLocaleString()} <span class="text-[#86837E]">/ {budget.toLocaleString()}</span>
+        </p>
       </div>
     </section>
+  );
+}
+
+function BackButton() {
+  return (
+    <button
+      class="flex h-8 w-8 items-center justify-center text-[#6F6B64] transition hover:text-[#37352F]"
+      onClick={() => history.back()}
+      type="button"
+      aria-label="Back"
+    >
+      <ChevronLeft class="h-4 w-4" />
+    </button>
+  );
+}
+
+interface ShareButtonProps {
+  tripId: string;
+  tripTitle: string;
+}
+function ShareButton({ tripId, tripTitle }: ShareButtonProps) {
+  const [isCopied, setIsCopied] = useState(false);
+
+  const handleShare = async () => {
+    if (typeof window === "undefined") return;
+
+    const shareUrl = `${window.location.origin}/trip/${tripId}`;
+    const shareNavigator = navigator as Navigator & {
+      share?: (data: ShareData) => Promise<void>;
+    };
+
+    if (shareNavigator.share) {
+      try {
+        await shareNavigator.share({
+          title: tripTitle,
+          url: shareUrl,
+        });
+        return;
+      } catch (error) {
+        console.warn("Share failed, copying link instead", error);
+      }
+    }
+
+    if (navigator.clipboard?.writeText) {
+      try {
+        await navigator.clipboard.writeText(shareUrl);
+        setIsCopied(true);
+        window.setTimeout(() => setIsCopied(false), 2000);
+      } catch (error) {
+        console.error("Failed to copy share link", error);
+      }
+    }
+  };
+
+  return (
+    <button
+      class="flex h-8 w-8 items-center justify-center text-[#6F6B64] transition hover:text-[#37352F]"
+      type="button"
+      onClick={handleShare}
+      aria-label="Share trip"
+      title={isCopied ? "Link copied" : "Share trip"}
+    >
+      <Share2 class="h-4 w-4" />
+    </button>
   );
 }
