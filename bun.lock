@@ -7,6 +7,7 @@
         "@supabase/supabase-js": "^2.75.1",
         "@tanstack/react-query": "^5.90.5",
         "date-fns": "^4.1.0",
+        "lucide-preact": "^0.546.0",
         "preact": "^10.27.2",
         "preact-router": "^4.1.2",
       },
@@ -326,6 +327,8 @@
     "lightningcss-win32-x64-msvc": ["lightningcss-win32-x64-msvc@1.30.1", "", { "os": "win32", "cpu": "x64" }, "sha512-PVqXh48wh4T53F/1CCu8PIPCxLzWyCnn/9T5W1Jpmdy5h9Cwd+0YQS6/LwhHXSafuc61/xg9Lv5OrCby6a++jg=="],
 
     "lru-cache": ["lru-cache@5.1.1", "", { "dependencies": { "yallist": "^3.0.2" } }, "sha512-KpNARQA3Iwv+jTA0utUVVbrh+Jlrr1Fv0e56GGzAFOXN7dk/FviaDW8LHmK52DlcH4WP2n6gI8vN1aesBFgo9w=="],
+
+    "lucide-preact": ["lucide-preact@0.546.0", "", { "peerDependencies": { "preact": "^10.5.13" } }, "sha512-o8DgbBws3QhR4Ke4tY8fs/NJsIbA7f9clqVwXancCkWAVj77Zew06lAGkKXN8UJw/xt5NqW1+tQU7u9KhBYewQ=="],
 
     "magic-string": ["magic-string@0.30.19", "", { "dependencies": { "@jridgewell/sourcemap-codec": "^1.5.5" } }, "sha512-2N21sPY9Ws53PZvsEpVtNuSW+ScYbQdp4b9qUaL+9QkHUrGFKo56Lg9Emg5s9V/qrtNBmiR01sYhUOwu3H+VOw=="],
 

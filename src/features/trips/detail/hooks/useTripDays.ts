@@ -9,25 +9,28 @@ export type TripDay = {
   date: string;
 };
 
-export function useTripDays(tripId: string) {
-  return useQuery({
-    queryKey: ['trip-days', tripId],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from('trip_days')
-        .select(`
-          id,
-          title,
-          trip_id,
-          day_index,
-          date
-        `)
-        .eq('trip_id', tripId)
-        .order('day_index', { ascending: true });
+const getTripDays = async (tripId: string, limit: number) => {
+  const { data, error } = await supabase
+    .from('trip_days')
+    .select(`
+      id,
+      title,
+      trip_id,
+      day_index,
+      date
+    `)
+    .eq('trip_id', tripId)
+    .limit(limit)
+    .order('day_index', { ascending: true });
 
-      if (error) throw error;
-      return data as TripDay[];
-    },
+  if (error) throw error;
+  return data as TripDay[];
+}
+
+export function useTripDays(tripId: string, limit: number) {
+  return useQuery({
+    queryKey: ['trip-days', tripId, limit],
+    queryFn: () => getTripDays(tripId, limit),
     enabled: !!tripId,
     staleTime: 1000 * 60 * 5, // 5 minutes
   });

@@ -10,6 +10,7 @@ export default function NewTrip() {
 
     const [formData, setFormData] = useState({
         title: '',
+        owner_id: '',
         destination: '',
         start_date: '',
         end_date: '',
