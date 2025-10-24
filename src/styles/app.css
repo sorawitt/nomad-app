@@ -11,7 +11,7 @@
   }
 
   .soft-card {
-    @apply rounded-md border border-white/50 bg-white/60 p-5 backdrop-blur-xl;
+    @apply rounded-3xl border border-white/50 bg-white/60 p-5 backdrop-blur-xl;
   }
 
   .soft-chip {

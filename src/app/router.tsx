@@ -7,6 +7,7 @@ import AuthCallback from '../features/auth/AuthCallback';
 import Home from '../features/home/home';
 import NewTrip from '../features/trips/NewTrip';
 import TripDetail from '../features/trips/detail/TripDetail';
+import ItineraryFull from '../features/itinerary/ItineraryFull';
 
 // Configure QueryClient with global error handling
 const queryClient = new QueryClient({
@@ -54,6 +55,12 @@ const ProtectedTripDetail = ({ id }: { id: string }) => (
   </ProtectedRoute>
 );
 
+const ProtectedItineraryFull = ({ id }: { id: string }) => (
+  <ProtectedRoute>
+    <ItineraryFull id={id} />
+  </ProtectedRoute>
+);
+
 const ProtectedNewTrip = () => (
   <ProtectedRoute>
     <NewTrip />
@@ -70,6 +77,7 @@ export function AppRouter() {
           <Route path="/trips/new" component={ProtectedNewTrip} />
           <Route default component={NotFound} />
           <Route path="/trip/:id" component={ProtectedTripDetail} />
+          <Route path="/trip/itinerary/:id" component={ProtectedItineraryFull} />
           <Route path="/auth/callback" component={AuthCallback} />
         </Router>
       </AuthProvider>

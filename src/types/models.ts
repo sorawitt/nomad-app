@@ -1,6 +1,7 @@
 export type Trip = {
   id: string;
   title: string;
+  destination?: string | null;
   start_date: string;
   end_date: string;
   updated_at: string;

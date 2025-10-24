@@ -8,7 +8,7 @@ export function useTripDetail(tripId: string) {
     queryFn: async () => {
       const { data, error } = await supabase
         .from('trips')
-        .select('id, title, start_date, end_date, currency_code, updated_at, owner_id')
+        .select('id, title, destination, start_date, end_date, currency_code, updated_at, owner_id')
         .eq('id', tripId)
         .single();
 
