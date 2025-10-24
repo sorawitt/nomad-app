@@ -1,6 +1,7 @@
 import { format } from "date-fns";
 import { enUS } from "date-fns/locale";
-import { ArrowUpLeft, List, Wallet } from "lucide-preact";
+import { ArrowUpLeft, ArrowUpRight, List, Wallet } from "lucide-preact";
+import { route } from "preact-router";
 import NavBar from "../../components/compounds/NavBar";
 import { useTripDetail } from "../trips/detail/hooks/useTripDetail";
 import { useTripDays, type TripDay } from "../trips/detail/hooks/useTripDays";
@@ -69,58 +70,27 @@ function ItinerarySummary(props: {
   const formattedEnd = endDate ? format(new Date(endDate), "d MMM yyyy", { locale: enUS }) : "-";
 
   return (
-    <section class="soft-card">
-      <header class="flex flex-wrap items-center justify-between gap-3">
-        <div>
-          <p class="text-[11px] font-medium uppercase tracking-[0.34em] text-slate-400">
-            Full itinerary
-          </p>
-          <h1 class="mt-2 text-[24px] font-semibold text-slate-900">
-            {formattedStart} – {formattedEnd}
-          </h1>
-        </div>
-        <span class="soft-chip text-xs uppercase tracking-[0.2em] text-slate-600">
-          {totalDays} {totalDays === 1 ? "day" : "days"}
-        </span>
-      </header>
-
-      <div class="mt-5 grid gap-4 sm:grid-cols-3">
-        <SummaryMetric
-          label="Activities"
-          value={`${totalActivities} ${totalActivities === 1 ? "item" : "items"}`}
-        />
-        <SummaryMetric
-          label="Planned spend"
-          value={totalSpend > 0 ? formatCurrency(totalSpend, currencyCode) : "No expenses yet"}
-        />
-        <SummaryMetric
-          label="Average per day"
-          value={
-            totalSpend > 0 && totalDays > 0
-              ? formatCurrency(totalSpend / totalDays, currencyCode)
-              : "-"
-          }
-        />
-      </div>
+    <section class="soft-card space-y-2">
+      <p class="text-[11px] font-medium uppercase tracking-[0.34em] text-slate-400">Full itinerary</p>
+      <h1 class="text-[20px] font-semibold text-slate-900">
+        {formattedStart} – {formattedEnd}
+      </h1>
+      <p class="text-xs text-slate-500">
+        {totalDays} {totalDays === 1 ? "day" : "days"} · {totalActivities} {totalActivities === 1 ? "activity" : "activities"}
+        {totalSpend > 0 ? ` · ${formatCurrency(totalSpend, currencyCode)} total` : ""}
+      </p>
     </section>
-  );
-}
-
-function SummaryMetric({ label, value }: { label: string; value: string }) {
-  return (
-    <div class="rounded-2xl border border-white/40 bg-white/50 p-4 text-sm text-slate-600 backdrop-blur">
-      <p class="text-[11px] uppercase tracking-[0.2em] text-slate-400">{label}</p>
-      <p class="mt-2 text-base font-semibold text-slate-900">{value}</p>
-    </div>
   );
 }
 
 function ItineraryList({
   days,
   currencyCode,
+  tripId,
 }: {
   days: TripDay[];
   currencyCode?: string | null;
+  tripId: string;
 }) {
   if (!days || days.length === 0) {
     return (
@@ -174,6 +144,7 @@ function ItineraryList({
                     ? formatCurrency(day.expense_total, currencyCode)
                     : "No expenses recorded"}
                 </span>
+                <AddActivityButton tripId={tripId} dayId={day.id} />
               </div>
             </li>
           );
@@ -238,6 +209,26 @@ function BackButton() {
       aria-label="Back"
     >
       <ArrowUpLeft class="h-4 w-4" />
+    </button>
+  );
+}
+
+type AddActivityButtonProps = {
+  tripId: string;
+  dayId?: string;
+  label?: string;
+};
+
+function AddActivityButton({ tripId, dayId, label = "Add activity" }: AddActivityButtonProps) {
+  const handleClick = () => {
+    const target = `/trip/${tripId}?add=activity${dayId ? `&day=${dayId}` : ""}`;
+    route(target, true);
+  };
+
+  return (
+    <button type="button" class="soft-inline-btn" onClick={handleClick}>
+      <span>{label}</span>
+      <ArrowUpRight class="h-3 w-3" />
     </button>
   );
 }

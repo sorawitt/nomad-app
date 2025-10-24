@@ -22,6 +22,10 @@
     @apply inline-flex items-center gap-1 rounded-full border border-slate-900/10 bg-slate-900 px-3 py-1.5 text-[11px] font-medium uppercase tracking-[0.2em] text-white transition hover:bg-slate-900/80;
   }
 
+  .soft-inline-btn {
+    @apply inline-flex items-center gap-1 rounded-full border border-slate-900/10 px-2.5 py-1 text-[11px] font-medium uppercase tracking-[0.18em] text-slate-600 transition hover:bg-slate-900/5;
+  }
+
   .soft-list {
     @apply space-y-2.5;
   }
